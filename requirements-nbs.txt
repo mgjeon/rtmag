@@ -1,0 +1,12 @@
+ipykernel
+ipywidgets
+pyvista[all,trame]<0.44
+astropy[all]
+sunpy[all]
+boto3==1.34.106
+botocore==1.34.106
+aiobotocore==2.13.0
+streamtracer
+numba
+neuraloperator
+scipy<1.14.0

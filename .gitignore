@@ -1,0 +1,10 @@
+*.egg-info/
+**/__pycache__/
+**/fastfl
+**/fastflh
+**/*.npy
+**/*.pt
+**/*.csv
+**/*.png
+**/*.txt
+!require*.txt
