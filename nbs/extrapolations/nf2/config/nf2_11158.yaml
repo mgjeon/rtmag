@@ -1,0 +1,8 @@
+# nf2 result
+filename: "D:/data/extrapolation/nf2/11158/377_20110214_000000_TAI/extrapolation_result.nf2"
+
+# nf2 -> npz
+save_path: "D:/data/extrapolation/nf2/11158/377_20110214_000000_TAI/nf2.npz"
+
+# reference hmi
+input: "D:/data/inputs/11158/congrid/hmi_b_congrid_20110214_000000_TAI.npz"

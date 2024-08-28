@@ -8,3 +8,8 @@
 **/*.png
 **/*.txt
 !require*.txt
+**/NLFFF
+**/nf2/wandb
+**/Wiegelmann/prepro
+**/Wiegelmann/relax1
+**/Wiegelmann/relax1_openmp

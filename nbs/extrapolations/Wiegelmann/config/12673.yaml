@@ -1,0 +1,13 @@
+# z=0
+input_file: "F:/isee_dataset/12673/input/input_12673_20170905_000000.npz"
+
+# unpack
+out_path: "D:/data/extrapolation/wie/12673/7115_20170905_000000_TAI/Bout.bin"
+save_out_path: "D:/data/extrapolation/wie/12673/7115_20170905_000000_TAI/wie.npz"
+
+nx: 512
+ny: 256
+nz: 256
+
+# reference hmi
+hmi: "D:/data/inputs/12673/congrid/hmi_b_congrid_20170905_000000_TAI.npz"
