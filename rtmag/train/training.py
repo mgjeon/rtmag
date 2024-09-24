@@ -13,10 +13,13 @@ from torchmetrics.regression import ConcordanceCorrCoef, MeanSquaredError
 
 from rtmag.dataset.dataset_hnorm_unit_aug import ISEEDataset_Multiple_Hnorm_Unit_Aug, ISEEDataset_Hnorm_Unit_Aug
 from rtmag.dataset.dataset_hnorm_unit_lowlou import LowLouDataset_Multiple_Hnorm_Unit
+from rtmag.dataset.dataset_hnorm_unit_aug_dxdydz import ISEEDataset_Multiple_Hnorm_Unit_Aug_dxdydz, ISEEDataset_Hnorm_Unit_Aug_dxdydz
 
 from rtmag.utils.diff_torch_batch import curl, divergence
 from rtmag.utils.eval_plot import plot_sample
 from rtmag.utils import eval
+
+from lightning.pytorch.utilities.memory import garbage_collection_cuda
 
 if torch.cuda.is_available():
     device = torch.device("cuda")
@@ -25,11 +28,14 @@ if torch.cuda.is_available():
 #---------------------------------------------------------------------------------------
 def get_dataloaders(args):
     if args.data["dataset_name"] == "Hnorm_Unit_Aug":
-        train_dataset = ISEEDataset_Multiple_Hnorm_Unit_Aug(args.data['dataset_path'], args.data["b_norm"], exc_noaa=args.data['exc_noaa'])
-        val_dataset = ISEEDataset_Hnorm_Unit_Aug(args.data['val_path'], args.data["b_norm"])
+        train_dataset = ISEEDataset_Multiple_Hnorm_Unit_Aug(args.data['dataset_path'], args.data["b_norm"], exc_noaa=args.data['exc_noaa'], h=args.data.get('h', 1.0))
+        val_dataset = ISEEDataset_Hnorm_Unit_Aug(args.data['val_path'], args.data["b_norm"], h=args.data.get('h', 1.0))
     elif args.data["dataset_name"] == "LowLou_Hnorm_Unit":
         train_dataset = LowLouDataset_Multiple_Hnorm_Unit(args.data['train_path'], args.data["b_norm"])
         val_dataset = LowLouDataset_Multiple_Hnorm_Unit(args.data['val_path'], args.data["b_norm"])
+    elif args.data["dataset_name"] == "Hnorm_Unit_Aug_dxdydz":
+        train_dataset = ISEEDataset_Multiple_Hnorm_Unit_Aug_dxdydz(args.data['dataset_path'], args.data["b_norm"], exc_noaa=args.data['exc_noaa'])
+        val_dataset = ISEEDataset_Hnorm_Unit_Aug_dxdydz(args.data['val_path'], args.data["b_norm"])
     else:
         raise NotImplementedError
     
@@ -211,8 +217,9 @@ def val_plot(model, val_dataloader, epoch, args, writer):
         writer.add_figure(f'plot/eps', fig, epoch)
         plt.close()
 
-        gc.collect()
         torch.cuda.empty_cache()
+        garbage_collection_cuda()
+        gc.collect()
 
 
 #---------------------------------------------------------------------------------------
@@ -227,8 +234,6 @@ def val(model, val_dataloader, epoch, args, writer):
         total_val_loss_div = 0.0
 
         for i_batch, sample_batched in enumerate(tqdm(val_dataloader, position=1, desc='Validation', leave=False, ncols=70)):
-            gc.collect()
-            torch.cuda.empty_cache()
             
             val_loss_dict = shared_step(model, sample_batched, args)
 
@@ -244,6 +249,10 @@ def val(model, val_dataloader, epoch, args, writer):
             total_val_loss_bc_bottom += val_loss_dict['bc_bottom'].item()
             total_val_loss_ff += val_loss_dict['ff'].item()
             total_val_loss_div += val_loss_dict['div'].item()
+
+            torch.cuda.empty_cache()
+            garbage_collection_cuda()
+            gc.collect()
         
         total_val_loss /= len(val_dataloader)
         total_val_loss_mse /= len(val_dataloader)
@@ -258,6 +267,10 @@ def val(model, val_dataloader, epoch, args, writer):
         writer.add_scalar('val/loss_bc_bottom', total_val_loss_bc_bottom, epoch)
         writer.add_scalar('val/loss_ff', total_val_loss_ff, epoch)
         writer.add_scalar('val/loss_div', total_val_loss_div, epoch)
+
+        torch.cuda.empty_cache()
+        garbage_collection_cuda()
+        gc.collect()
 
         return total_val_loss
 
@@ -293,8 +306,6 @@ def train(model, optimizer, train_dataloader, val_dataloader, ck_epoch, CHECKPOI
 
         with tqdm(train_dataloader, desc='Training', ncols=140) as tqdm_loader_train:
             for i_batch, sample_batched in enumerate(tqdm_loader_train):
-                gc.collect()
-                torch.cuda.empty_cache()
 
                 tqdm_loader_train.set_description(f"epoch {epoch}")
                 
@@ -332,6 +343,10 @@ def train(model, optimizer, train_dataloader, val_dataloader, ck_epoch, CHECKPOI
                 torch.save({'epoch': epoch, 'global_step': global_step, 
                             'model_state_dict': model.state_dict()}, 
                             os.path.join(args.base_path, "last_model.pt"))
+
+                torch.cuda.empty_cache()
+                garbage_collection_cuda()
+                gc.collect()
 
         total_train_loss /= len(train_dataloader)
         total_train_loss_mse /= len(train_dataloader)
@@ -374,3 +389,7 @@ def train(model, optimizer, train_dataloader, val_dataloader, ck_epoch, CHECKPOI
             validation_loss = total_val_loss
             torch.save({'epoch': epoch, 'global_step': global_step, 'validation_loss': validation_loss,
                         'model_state_dict': model.state_dict()}, os.path.join(base_path, "best_model.pt"))
+            
+        torch.cuda.empty_cache()
+        garbage_collection_cuda()
+        gc.collect()

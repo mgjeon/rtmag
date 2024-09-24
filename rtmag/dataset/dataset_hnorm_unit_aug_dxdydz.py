@@ -5,9 +5,9 @@ from pathlib import Path
 
 
 # train
-class ISEEDataset_Multiple_Hnorm_Unit_Aug(Dataset):
+class ISEEDataset_Multiple_Hnorm_Unit_Aug_dxdydz(Dataset):
 
-    def __init__(self, dataset_path, b_norm, exc_noaa=None, h=1.0):
+    def __init__(self, dataset_path, b_norm, exc_noaa=None):
         self.files = list(Path(dataset_path).glob('**/input/*.npz'))
         if isinstance(exc_noaa, str):
             self.files = sorted([f for f in self.files if not exc_noaa == str(f.parent.parent.stem)])
@@ -17,7 +17,6 @@ class ISEEDataset_Multiple_Hnorm_Unit_Aug(Dataset):
                 self.files = sorted([f for f in self.files if not t_noaa == str(f.parent.parent.stem)])
         self.b_norm = b_norm
         self.length = len(self.files)
-        self.h = h
 
     def __len__(self):
         return 2*self.length
@@ -29,22 +28,33 @@ class ISEEDataset_Multiple_Hnorm_Unit_Aug(Dataset):
             idx = idx - self.length
         input_file = self.files[idx]
         # NLFFF(z=0) [3, 513, 257,  1]
-        inputs = torch.from_numpy(np.load(input_file, mmap_mode='r')['input'].astype(np.float32))
+        input_files = np.load(input_file, mmap_mode='r')
+        inputs = torch.from_numpy(input_files['input'].astype(np.float32))
         # NLFFF(z=0) [3, 512, 256,  1]  remove duplicated periodic boundary
         inputs = inputs[:, :-1, :-1, :]
         inputs = inputs / self.b_norm
         
-        dx = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
-        dy = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
-        dz = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
+        dx = torch.from_numpy(input_files['dx'].astype(np.float32)).reshape(-1, 1)
+        dy = torch.from_numpy(input_files['dy'].astype(np.float32)).reshape(-1, 1)
+        dz = torch.from_numpy(input_files['dz'].astype(np.float32)).reshape(-1, 1)
 
         label_file = self.files[idx].parent.parent / 'label' / f'label_{self.files[idx].stem[6:]}.npz'
+        label_files = np.load(label_file, mmap_mode='r')
         # NLFFF     [3, 513, 257, 257]
-        labels = torch.from_numpy(np.load(label_file, mmap_mode='r')['label'].astype(np.float32))
+        labels = torch.from_numpy(label_files['label'].astype(np.float32))
         # NLFFF     [3, 512, 256, 256]  remove duplicated periodic boundary
         labels = labels[:, :-1, :-1, :-1]
         divisor = (self.b_norm / np.arange(1, labels.shape[-1] + 1)).reshape(1, 1, 1, -1).astype(np.float32)
         labels = labels / divisor
+
+        x1 = label_files['x'][:-1]
+        y1 = label_files['y'][:-1]
+        x11 = (x1 - x1.min()) / (x1.max() - x1.min())
+        y11 = (y1 - y1.min()) / (y1.max() - y1.min())
+        xx, yy = np.meshgrid(x11, y11, indexing='ij')
+        xx = torch.from_numpy(xx[None, :, :, None].astype(np.float32))
+        yy = torch.from_numpy(yy[None, :, :, None].astype(np.float32))
+        inputs = torch.concatenate([inputs, xx, yy], axis=0)
 
         if is_flip:
             # rotation by 180 deg around z-axis
@@ -63,9 +73,9 @@ class ISEEDataset_Multiple_Hnorm_Unit_Aug(Dataset):
 
 
 # validataion, test
-class ISEEDataset_Hnorm_Unit_Aug(Dataset):
+class ISEEDataset_Hnorm_Unit_Aug_dxdydz(Dataset):
 
-    def __init__(self, data_path, b_norm, h=1.0):
+    def __init__(self, data_path, b_norm):
         if isinstance(data_path, str):
             files = list(Path(data_path).glob('**/input/*.npz'))
         elif isinstance(data_path, list):
@@ -75,7 +85,6 @@ class ISEEDataset_Hnorm_Unit_Aug(Dataset):
         self.files = sorted([f for f in files])
         self.b_norm = b_norm
         self.length = len(self.files)
-        self.h = h
 
     def __len__(self):
         return self.length
@@ -83,23 +92,33 @@ class ISEEDataset_Hnorm_Unit_Aug(Dataset):
     def __getitem__(self, idx):
         input_file = self.files[idx]
         # NLFFF(z=0) [3, 513, 257,  1]
-        inputs = torch.from_numpy(np.load(input_file, mmap_mode='r')['input'].astype(np.float32))
+        input_files = np.load(input_file, mmap_mode='r')
+        inputs = torch.from_numpy(input_files['input'].astype(np.float32))
         # NLFFF(z=0) [3, 512, 256,  1]  remove duplicated periodic boundary
         inputs = inputs[:, :-1, :-1, :]
         inputs = inputs / self.b_norm
-
-        # Assume unit dx, dy, dz
-        dx = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
-        dy = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
-        dz = torch.from_numpy(np.array([self.h]).astype(np.float32)).reshape(-1, 1)
+        
+        dx = torch.from_numpy(input_files['dx'].astype(np.float32)).reshape(-1, 1)
+        dy = torch.from_numpy(input_files['dy'].astype(np.float32)).reshape(-1, 1)
+        dz = torch.from_numpy(input_files['dz'].astype(np.float32)).reshape(-1, 1)
 
         label_file = self.files[idx].parent.parent / 'label' / f'label_{self.files[idx].stem[6:]}.npz'
+        label_files = np.load(label_file, mmap_mode='r')
         # NLFFF     [3, 513, 257, 257]
-        labels = torch.from_numpy(np.load(label_file, mmap_mode='r')['label'].astype(np.float32))
+        labels = torch.from_numpy(label_files['label'].astype(np.float32))
         # NLFFF     [3, 512, 256, 256]  remove duplicated periodic boundary
         labels = labels[:, :-1, :-1, :-1]
         divisor = (self.b_norm / np.arange(1, labels.shape[-1] + 1)).reshape(1, 1, 1, -1).astype(np.float32)
         labels = labels / divisor
+
+        x1 = label_files['x'][:-1]
+        y1 = label_files['y'][:-1]
+        x11 = (x1 - x1.min()) / (x1.max() - x1.min())
+        y11 = (y1 - y1.min()) / (y1.max() - y1.min())
+        xx, yy = np.meshgrid(x11, y11, indexing='ij')
+        xx = torch.from_numpy(xx[None, :, :, None].astype(np.float32))
+        yy = torch.from_numpy(yy[None, :, :, None].astype(np.float32))
+        inputs = torch.concatenate([inputs, xx, yy], axis=0)
 
         # [3, 513, 257, 257] -> [3, 512, 256, 256]  remove duplicated periodic boundary
         potential = torch.from_numpy(np.load(label_file, mmap_mode='r')['pot'].astype(np.float32))

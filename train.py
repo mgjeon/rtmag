@@ -54,6 +54,34 @@ if __name__ == "__main__":
             uno_out_channels = args.model["uno_out_channels"],
             uno_scalings = args.model["uno_scalings"],
         )
+    elif args.model["model_name"] == "UNO_dxdydz":
+        class UNO_dxdydz(torch.nn.Module):
+            def __init__(self, args):
+                super().__init__()
+                self.uno = UNO(
+                    hidden_channels = args.model["hidden_channels"],
+                    in_channels = args.model["in_channels"],
+                    out_channels = args.model["out_channels"],
+                    lifting_channels = args.model["lifting_channels"],
+                    projection_channels = args.model["projection_channels"],
+                    n_layers = args.model["n_layers"],
+
+                    factorization = args.model["factorization"],
+                    implementation = args.model["implementation"],
+                    rank = args.model["rank"],
+
+                    uno_n_modes = args.model["uno_n_modes"], 
+                    uno_out_channels = args.model["uno_out_channels"],
+                    uno_scalings = args.model["uno_scalings"],
+                )
+                self.fc = torch.nn.Linear(5, 3)
+
+            def forward(self, x):
+                x = self.uno(x)
+                x = self.fc(x)
+                return x
+        
+        model = UNO_dxdydz(args)
     else:
         raise NotImplementedError
 

@@ -257,6 +257,142 @@ def relax(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None
     return b.cpu().numpy()
 
 
+def relax_dxdydz(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None, dx: float = 1.0, dy: float = 1.0, dz: float = 1.0):
+    """
+    Input:
+        bp : [Nx, Ny, Nz, 3]
+    
+    Output:
+        b : [Nx, Ny, Nz, 3]
+    """
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    bp = torch.tensor(bp)
+    nx, ny, nz, _ = bp.shape
+    bottom = bp[:, :, 0, :]
+
+    nd = 0
+    # nave = torch.sqrt(torch.tensor(1.0*(nx - 2 * nd - 1)*(ny - 2 * nd - 1)))
+    # Lx = 1.0*(nx - 1) / nave
+    # Ly = 1.0*(ny - 1) / nave
+    # Lz = 1.0*(nz - 1) / nave
+    # dx = dy = dz = Lx / (nx - 1)
+    Bave = torch.sqrt((bottom**2).sum(-1)).sum() / (nx - 2 * nd) / (ny - 2 * nd)
+    print("nx, ny, nz = ", nx, ny, nz)
+    # print("Lx, Ly, Lz = ", Lx, Ly, Lz)
+    print("dx, dy, dz = ", dx, dy, dz)
+    print("Bave = ", Bave)
+
+    if mue is None:
+        mue = 0.1*dx*dx
+
+    print("maxit = ", maxit)
+    print("mue = ", mue)
+
+    b = (bp / Bave).to(device)
+
+    Bx = torch.clone(b[..., 0])
+    By = torch.clone(b[..., 1])
+    Bz = torch.clone(b[..., 2])
+
+    Bx1 = torch.clone(Bx)
+    By1 = torch.clone(By)
+    Bz1 = torch.clone(Bz)
+
+    Bx2 = torch.clone(Bx)
+    By2 = torch.clone(By)
+    Bz2 = torch.clone(Bz)
+
+    it = -1
+    restore = 0
+    oldL = 0
+    statcount = 0
+
+    ls = []
+    fs = []
+    lis = []
+    fis = []
+
+
+    while (it < maxit and statcount < 10 and mue > 1e-7*dx*dx):
+        it = it + 1
+        
+        Fx, Fy, Fz, L, _, _ = calculateL(Bx, By, Bz, dx, dy, dz)
+
+        if it == 0:
+            oldL = L
+        
+        if restore == 1:
+            L = oldL
+
+        if it > 0 and L > oldL:
+            restore = 1
+            mue = 0.5*mue
+            it = it - 1
+            Bx1 = torch.clone(Bx2)
+            By1 = torch.clone(By2)
+            Bz1 = torch.clone(Bz2)
+
+            Bx = torch.clone(Bx1)
+            By = torch.clone(By1)
+            Bz = torch.clone(Bz1)
+        
+        else: 
+            mue = 1.01*mue
+            restore = 0
+            oldL = L
+
+    
+        diagstep = 10
+        if it % diagstep == 0:
+            Fxi, Fyi, Fzi, Li, _, _ = calculateL(Bx[1:-1, 1:-1, 1:-1], By[1:-1, 1:-1, 1:-1], Bz[1:-1, 1:-1, 1:-1], dx, dy, dz)
+
+            F = torch.sqrt((Fx**2 + Fy**2 + Fz**2)).mean()
+            Fi = torch.sqrt((Fxi**2 + Fyi**2 + Fzi**2)).mean()
+
+            print("it = ", it, "L = ", L, "F = ", F, "Li = ", Li, "Fi = ", Fi)
+
+            ls.append(L.item())
+            fs.append(F.item())
+            lis.append(Li.item())
+            fis.append(Fi.item())
+
+            if it == 0:
+                prevL = 2.0*L 
+                newL = L
+            else: 
+                prevL = newL
+                newL = L
+            
+            gradL = torch.abs((newL - prevL) / newL)
+            if gradL < 0.00001:
+                statcount = statcount + 1
+                print("STATIONARY COUNT = ", statcount, "grad L/L", gradL)
+            if gradL > 0.00001:
+                statcount = 0
+                print("grad L/L", gradL)
+
+        if oldL >= L:
+            Bx1[1:-1, 1:-1, 1:-1] = Bx[1:-1, 1:-1, 1:-1] + mue*Fx[1:-1, 1:-1, 1:-1]
+            By1[1:-1, 1:-1, 1:-1] = By[1:-1, 1:-1, 1:-1] + mue*Fy[1:-1, 1:-1, 1:-1]
+            Bz1[1:-1, 1:-1, 1:-1] = Bz[1:-1, 1:-1, 1:-1] + mue*Fz[1:-1, 1:-1, 1:-1]
+        
+        Bx2 = torch.clone(Bx)
+        By2 = torch.clone(By)
+        Bz2 = torch.clone(Bz)
+
+        Bx = torch.clone(Bx1)
+        By = torch.clone(By1)
+        Bz = torch.clone(Bz1)
+
+    torch.save({'it': it,'L': ls, 'F': fs, 'Li': lis, 'Fi': fis}, f"{filename}.pt")
+
+    b = torch.stack([Bx, By, Bz], dim=-1) * Bave
+
+    return b.cpu().numpy()
+
+
 
 def relax_noprint(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None):
     """
