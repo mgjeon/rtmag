@@ -1,4 +1,0 @@
-neuraloperator
-tqdm
-torchmetrics
-tensorboard

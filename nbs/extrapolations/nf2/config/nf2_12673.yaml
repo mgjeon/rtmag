@@ -1,8 +1,0 @@
-# nf2 result
-filename: "D:/data/extrapolation/nf2/12673/7115_20170905_000000_TAI/extrapolation_result.nf2"
-
-# nf2 -> npz
-save_path: "D:/data/extrapolation/nf2/12673/7115_20170905_000000_TAI/nf2.npz"
-
-# reference hmi
-input: "D:/data/inputs/12673/congrid/hmi_b_congrid_20170905_000000_TAI.npz"
