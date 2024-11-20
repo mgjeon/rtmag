@@ -1,10 +1,10 @@
-from magplot.base import create_mesh, mag_plotter
+from rtmag.utils.magplot import create_mesh, mag_plotter
 import pyvista as pv
 pv.set_jupyter_backend('static')
 
 def draw(b, radius=0.2):
-    vmin = -200
-    vmax = 200
+    vmin = -100
+    vmax = 100
     i_siz=b.shape[0] / 2
     j_siz=b.shape[1] / 2
     i_res=8

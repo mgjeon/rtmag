@@ -857,7 +857,7 @@ def get_j_map_Mm(b, dx, dy, dz):
     j = current_density(b, dx_cm, dy_cm, dz_cm)  # [mA/m^2]
     j_map = vector_norm(j).sum(2)                # [mA/m^2]
     j_map *= 1e-7                                # [A/cm^2]
-    j_map *= dz_cm   
+    j_map *= dz_cm                               # [A/cm]
 
     bottom = j[:, :, 0, 2].T    
     return j_map, bottom 

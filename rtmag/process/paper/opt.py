@@ -240,7 +240,7 @@ def relax(bp, filename, maxit=10000, mue=None, device=None):
             F = torch.sqrt((Fx**2 + Fy**2 + Fz**2)).mean()
             Fi = torch.sqrt((Fxi**2 + Fyi**2 + Fzi**2)).mean()
 
-            print("it = ", it, "L = ", L, "F = ", F, "Li = ", Li, "Fi = ", Fi)
+            print("it = ", it, "L = ", L.item(), "F = ", F.item(), "Li = ", Li.item(), "Fi = ", Fi.item())
 
             ls.append(L.item())
             fs.append(F.item())
@@ -257,10 +257,10 @@ def relax(bp, filename, maxit=10000, mue=None, device=None):
             gradL = torch.abs((newL - prevL) / newL)
             if gradL < 0.00001:
                 statcount = statcount + 1
-                print("STATIONARY COUNT = ", statcount, "grad L/L", gradL)
+                print("STATIONARY COUNT = ", statcount, "grad L/L", gradL.item())
             if gradL > 0.00001:
                 statcount = 0
-                print("grad L/L", gradL)
+                print("grad L/L", gradL.item())
 
         if oldL >= L:
             Bx1[1:-1, 1:-1, 1:-1] = Bx[1:-1, 1:-1, 1:-1] + mue*Fx[1:-1, 1:-1, 1:-1]

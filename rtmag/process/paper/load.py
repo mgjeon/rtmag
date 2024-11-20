@@ -35,7 +35,7 @@ class MyModel:
         #     except:
         #         checkpoint = torch.load(meta_path / "best_model.pt", map_location=device)
         #         self.epoch = checkpoint['epoch']
-        checkpoint = torch.load(meta_path, map_location=device)
+        checkpoint = torch.load(meta_path, map_location=device, weights_only=True)
         self.epoch = checkpoint['epoch']
 
         args = argparse.Namespace()

@@ -16,7 +16,7 @@ def get_sharp_map(d, harpnum):
     c = drms.Client()
 
     hmi_query = f'hmi.sharp_cea_720s[{harpnum}][{yr}.{mo}.{da}_{hr}:{mi}:00_TAI]'
-    hmi_keys, hmi_segments = c.query(hmi_query, key=drms.const.all, seg='Bp, Bt, Br, magnetogram')
+    hmi_keys, hmi_segments = c.query(hmi_query, key=drms.JsocInfoConstants.all, seg='Bp, Bt, Br, magnetogram')
     print("T_REC: ", hmi_keys.T_REC[0])
 
     hmi_Bp_url = 'http://jsoc.stanford.edu' + hmi_segments.Bp[0]
@@ -55,7 +55,7 @@ def get_aia_map(d, wavelength=171):
     wavelength = str(wavelength)
     
     aia_query = f'aia.lev1_euv_12s[{yr}-{mo}-{da}T{hr}:00:00Z][{wavelength}]'
-    aia_keys, aia_segments = c.query(aia_query, key=drms.const.all, seg='image')
+    aia_keys, aia_segments = c.query(aia_query, key=drms.JsocInfoConstants.all, seg='image')
     print("T_REC: ", aia_keys.T_REC[0])
 
     aia_url = 'http://jsoc.stanford.edu' + aia_segments.image[0]

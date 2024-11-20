@@ -212,6 +212,7 @@ class mag_plotter:
             lighting=False
         )
 
+        self.strl = strl
         self.tube = strl.tube(radius=i_size/400)
         self.dargs_B = dargs_B        
         return strl.tube(radius=i_size/400), self.bottom, dargs_B

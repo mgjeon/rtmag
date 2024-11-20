@@ -302,17 +302,23 @@ def metrics_j_two(b):
                 res[x, y, z] = np.abs(nu[x, y, z]) / (de[x, y, z] + 1e-7)
     L_d_n = res.mean()
 
+    dx = 1  # pixel
+    dy = 1  # pixel
+    dz = 1  # pixel
+    DeltaV = dx * dy * dz
+    SurfaceA = (dx * dy + dy * dz + dz * dx) * 2
+
     nu = divergence(b)
-    de = vector_norm(j)
+    de = vector_norm(b)
     nx, ny, nz = nu.shape
     res = np.zeros((nx, ny, nz))
     for x in prange(nx):
         for y in prange(ny):
             for z in prange(nz):
                 res[x, y, z] = np.abs(nu[x, y, z]) / (de[x, y, z] + 1e-7)
-    L_d_n_n = res.mean()
+    fi = res.mean() * (DeltaV / SurfaceA)
 
-    return CW_sin, L_d_n, L_d_n_n
+    return CW_sin, L_d_n, fi
 
 
 @njit(parallel=True, cache=True)
@@ -339,17 +345,20 @@ def metrics_j_two_dxdydz(b, dx, dy, dz):
                 res[x, y, z] = np.abs(nu[x, y, z]) / (de[x, y, z] + 1e-7)
     L_d_n = res.mean()
 
+    DeltaV = dx * dy * dz
+    SurfaceA = (dx * dy + dy * dz + dz * dx) * 2
+
     nu = divergence(b, dx, dy, dz)
-    de = vector_norm(j)
+    de = vector_norm(b)
     nx, ny, nz = nu.shape
     res = np.zeros((nx, ny, nz))
     for x in prange(nx):
         for y in prange(ny):
             for z in prange(nz):
                 res[x, y, z] = np.abs(nu[x, y, z]) / (de[x, y, z] + 1e-7)
-    L_d_n_n = res.mean()
+    fi = res.mean() * (DeltaV / SurfaceA)
 
-    return CW_sin, L_d_n, L_d_n_n
+    return CW_sin, L_d_n, fi
 
 
 @njit(cache=True)
@@ -404,8 +413,8 @@ def evaluate(b, B, ret=True):
     result["E_m'"] = Em_prime(b, B)
     result['eps'] = eps(b, B)
 
-    result['sigmaJ_b'], result['div_b'], result['div_b_n'] = metrics_j_two(b)
-    result['sigmaJ_B'], result['div_B'], result['div_B_n'] = metrics_j_two(B)
+    result['sigmaJ_b'], result['div_b'], result['fi_b'] = metrics_j_two(b)
+    result['sigmaJ_B'], result['div_B'], result['fi_B'] = metrics_j_two(B)
 
     result["sig100_b"] = result['sigmaJ_b']*100
     result["div100_b"] = result['div_b']*100
@@ -416,6 +425,10 @@ def evaluate(b, B, ret=True):
     if ret:
         for key, value in result.items():
             print(f"{key:<10}: {value:.2f}")
+
+        print()
+        for key, value in result.items():
+            print(f"{key:<10}: {value:.2g}")
 
     return result
 
@@ -438,8 +451,8 @@ def evaluate_dxdydz(b, B, dx, dy, dz, ret=True):
     result["E_m'"] = Em_prime(b, B)
     result['eps'] = eps(b, B)
 
-    result['sigmaJ_b'], result['div_b'], result['div_b_n'] = metrics_j_two_dxdydz(b, dx, dy, dz)
-    result['sigmaJ_B'], result['div_B'], result['div_B_n'] = metrics_j_two_dxdydz(B, dx, dy, dz)
+    result['sigmaJ_b'], result['div_b'], result['fi_b'] = metrics_j_two_dxdydz(b, dx, dy, dz)
+    result['sigmaJ_B'], result['div_B'], result['fi_B'] = metrics_j_two_dxdydz(B, dx, dy, dz)
 
     result["sig100_b"] = result['sigmaJ_b']*100
     result["div100_b"] = result['div_b']*100
@@ -450,6 +463,10 @@ def evaluate_dxdydz(b, B, dx, dy, dz, ret=True):
     if ret:
         for key, value in result.items():
             print(f"{key:<10}: {value:.2f}")
+
+        print()
+        for key, value in result.items():
+            print(f"{key:<10}: {value:.2g}")
 
     return result
 
