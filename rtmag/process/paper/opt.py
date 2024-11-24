@@ -157,6 +157,8 @@ def relax(bp, filename, maxit=10000, mue=None, device=None):
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    print("device = ", device)
+
     nx, ny, nz, _ = bp.shape
     bottom = bp[:, :, 0, :]
 
