@@ -35,11 +35,13 @@ def get_potential(b_n, height, l=1/np.sqrt(2*np.pi), batch_size=2048, strides=(1
     # torch code
     # r = (x * y, 3); coords = (x*y*z, 3), c = (1, 3)
     # --> (x * y, x * y * z, 3) --> (x * y, x * y * z) --> (x * y * z)
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    # device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cpu')
     with torch.no_grad():
         b_n = torch.tensor(b_n, dtype=torch.float32, )
         r_p = torch.tensor(r_p, dtype=torch.float32, )
-        model = nn.DataParallel(PotentialModel(b_n, r_p, l)).to(device)
+        # model = nn.DataParallel(PotentialModel(b_n, r_p, l)).to(device)
+        model = PotentialModel(b_n, r_p, l).to(device)
 
         coords = torch.tensor(coords, dtype=torch.float32)
         potential = []

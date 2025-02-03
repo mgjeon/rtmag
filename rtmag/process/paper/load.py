@@ -195,6 +195,7 @@ class MyModel:
             print(f"b_norm = {b_norm} G")
         # [bs, 1, 256, 512, 3]
         model_input = torch.from_numpy(model_input.astype(np.float32) / b_norm).to(device)
+        print(model_input.device)
         model_output = model(model_input)
         self.model_input = model_input
         self.outputs = model_output.detach().cpu()

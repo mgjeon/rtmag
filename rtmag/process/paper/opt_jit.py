@@ -120,8 +120,9 @@ def calculateL(bx, by, bz, dx: float, dy: float, dz: float):
 
     return Fx, Fy, Fz, helpL, helpL1, helpL2
 
+from pathlib import Path
 
-def relax(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None):
+def relax(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None, root: str = None):
     """
     Input:
         bp : [Nx, Ny, Nz, 3]
@@ -132,6 +133,7 @@ def relax(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
+    print("Using device: ", device)
     bp = torch.tensor(bp)
     nx, ny, nz, _ = bp.shape
     bottom = bp[:, :, 0, :]
@@ -250,7 +252,9 @@ def relax(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None
         By = torch.clone(By1)
         Bz = torch.clone(Bz1)
 
-    torch.save({'it': it,'L': ls, 'F': fs, 'Li': lis, 'Fi': fis}, f"{filename}.pt")
+    root = Path(root) if root is not None else Path(".")
+
+    torch.save({'it': it,'L': ls, 'F': fs, 'Li': lis, 'Fi': fis}, root / f"{filename}.pt")
 
     b = torch.stack([Bx, By, Bz], dim=-1) * Bave
 
@@ -394,7 +398,7 @@ def relax_dxdydz(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float
 
 
 
-def relax_noprint(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None):
+def relax_noprint(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: float = None, device: torch.device = None, root: str = None):
     """
     Input:
         bp : [Nx, Ny, Nz, 3]
@@ -512,7 +516,9 @@ def relax_noprint(bp: torch.Tensor, filename: str, maxit: int = 10000, mue: floa
         By = torch.clone(By1)
         Bz = torch.clone(Bz1)
 
-    torch.save({'it': it,'L': ls, 'F': fs, 'Li': lis, 'Fi': fis}, f"{filename}.pt")
+    root = Path(root) if root is not None else Path(".")
+
+    torch.save({'it': it,'L': ls, 'F': fs, 'Li': lis, 'Fi': fis}, root / f"{filename}.pt")
 
     b = torch.stack([Bx, By, Bz], dim=-1) * Bave
 
