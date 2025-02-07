@@ -8,7 +8,7 @@
 ```
 conda env create -f environment.yml
 conda activate rtmag
-pip install neuraloperator<1.0
+pip install "neuraloperator<1.0"
 pip install -r https://raw.githubusercontent.com/NeuralOperator/neuraloperator/main/requirements.txt
 pip install -e .
 ```
