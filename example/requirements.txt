@@ -1,0 +1,7 @@
+ipykernel
+ipywidgets
+drms
+astropy
+sunpy[all]
+numba
+streamtracer
