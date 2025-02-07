@@ -1,0 +1,10 @@
+tensorboard
+torchmetrics
+numpy
+scipy
+matplotlib
+pyvista
+tqdm
+netcdf4
+joblib
+lightning
