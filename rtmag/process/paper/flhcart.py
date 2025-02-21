@@ -1,4 +1,6 @@
 """
+https://github.com/antyeates1983/flhtools
+
 Python class for a 3d magnetic field snapshot on a staggered Cartesian grid.
 
 anthony.yeates@durham.ac.uk
