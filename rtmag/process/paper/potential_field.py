@@ -1,3 +1,5 @@
+# https://github.com/RobertJaro/NF2
+
 import numpy as np
 import torch
 from astropy.nddata import block_replicate
