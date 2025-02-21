@@ -1,3 +1,5 @@
+# https://github.com/RobertJaro/NF2
+
 import numpy as np
 from copy import copy
 from astropy.nddata import block_reduce
