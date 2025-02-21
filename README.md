@@ -100,7 +100,3 @@ python train.py --config config/train.json
 ```
 tensorboard --logdir=<base_path>
 ```
-
-## References
-- https://github.com/RobertJaro/NF2
-- https://github.com/antyeates1983/flhtools
