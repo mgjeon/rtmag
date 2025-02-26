@@ -1,6 +1,6 @@
 # RTMAG
 
-This repo contains the source code for the paper "Real-time Extrapolation of Nonlinear Force-Free Fields from Photospheric Vector Magnetic Fields Using a Physics-Informed Neural Operator" (ApJS, accepted).
+This repository contains the source code for the paper "Real-time Extrapolation of Nonlinear Force-Free Fields from Photospheric Vector Magnetic Fields Using a Physics-Informed Neural Operator" (ApJS, accepted).
 
 ## Environment
 - Python 3.11
