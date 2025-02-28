@@ -2,6 +2,12 @@
 
 This repository contains the source code for the paper "Real-time Extrapolation of Nonlinear Force-Free Fields from Photospheric Vector Magnetic Fields Using a Physics-Informed Neural Operator" (ApJS, accepted).
 
+## Example
+
+Caution: The reliability of AI-generated NLFFFs should be further investigated in future studies.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mgjeon/rtmag/blob/main/examples/example_colab.ipynb)
+
 ## Environment
 - Python 3.11
 - [PyTorch](https://pytorch.org/)
