@@ -104,7 +104,14 @@ python train.py --config config/train_lowlou.json
 python train.py --config config/train.json
 ```
 
-## Logs
+### Logs
 ```
 tensorboard --logdir=<base_path>
 ```
+
+## Acknowledgements
+- I heavily referenced the [NF2 code](https://github.com/RobertJaro/NF2) for various tasks, such as the calculation of Low and Lou fields, metrics, and NLFFFs from PINNs. Thanks to the authors.
+- I use data and code from the [ISEE NLFFF database](https://hinode.isee.nagoya-u.ac.jp/nlfff_database/) to create NLFFF datasets for real solar active regions. Thanks to the authors.
+- I use [streamtracer](https://github.com/sunpy/streamtracer) and refer to the code from [flhtools](https://github.com/antyeates1983/flhtools) for field line tracing and plotting. Thanks to the authors.
+- I use [pyvista](https://github.com/pyvista/pyvista) for 3D field line visualization in Colab notebook. Thanks to the authors.
+- I appreciate the community efforts in creating other open-source packages used in this research, such as [SunPy](https://github.com/sunpy/sunpy) and [Astropy](https://github.com/astropy/astropy).
