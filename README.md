@@ -1,6 +1,6 @@
 # RTMAG
 
-This repository contains the source code for the paper "Real-time Extrapolation of Nonlinear Force-Free Fields from Photospheric Vector Magnetic Fields Using a Physics-Informed Neural Operator" (ApJS, accepted).
+In this study, we develop a physics-informed neural operator (PINO) model that learns the solution operator from 2D photospheric vector magnetic fields to 3D nonlinear force-free fields (NLFFFs). We train our PINO model using physics loss from NLFFF partial differential equations, as well as data loss from target NLFFFs. We validate our method using an analytical NLFFF model. We then train and evaluate our PINO model with 2327 numerical NLFFFs of 211 active regions from the Institute for Space-Earth Environmental Research database. The results show that our trained PINO model can generate an NLFFF within 1 s for any active region on a single consumer GPU, making real-time extrapolation of NLFFFs possible. Our artificial intelligence (AI)-generated NLFFFs are qualitatively and quantitatively quite similar to the target NLFFFs for 30 active regions. The magnetic energy of the AI-generated NLFFFs of active region 11158 follows a similar trend to the target NLFFFs as well as other conventional methods.
 
 ## Example
 
@@ -115,3 +115,18 @@ tensorboard --logdir=<base_path>
 - I use [streamtracer](https://github.com/sunpy/streamtracer) and refer to the code from [flhtools](https://github.com/antyeates1983/flhtools) for field line tracing and plotting. Thanks to the authors.
 - I use [pyvista](https://github.com/pyvista/pyvista) for 3D field line visualization in Colab notebook. Thanks to the authors.
 - I appreciate the community efforts in creating other open-source packages used in this research, such as [SunPy](https://github.com/sunpy/sunpy) and [Astropy](https://github.com/astropy/astropy).
+
+## Citation
+```
+@article{Jeon_2025,
+doi = {10.3847/1538-4365/adbaea},
+url = {https://dx.doi.org/10.3847/1538-4365/adbaea},
+year = {2025},
+month = {apr},
+publisher = {The American Astronomical Society},
+volume = {277},
+number = {2},
+pages = {54},
+author = {Jeon, Mingyu and Jeong, Hyun-Jin and Moon, Yong-Jae and Kang, Jihye and Kusano, Kanya},
+}
+```
