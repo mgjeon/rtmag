@@ -118,17 +118,19 @@ tensorboard --logdir=<base_path>
 
 ## Citation
 ```
-@article{Jeon_2025,
-doi = {10.3847/1538-4365/adbaea},
-url = {https://dx.doi.org/10.3847/1538-4365/adbaea},
-year = {2025},
-month = {apr},
-publisher = {The American Astronomical Society},
-volume = {277},
-number = {2},
-pages = {54},
-author = {Jeon, Mingyu and Jeong, Hyun-Jin and Moon, Yong-Jae and Kang, Jihye and Kusano, Kanya},
-title = {Real-time Extrapolation of Nonlinear Force-free Fields from Photospheric Vector Magnetic Fields Using a Physics-informed Neural Operator},
-journal = {The Astrophysical Journal Supplement Series},
+@ARTICLE{2025ApJS..277...54J,
+       author = {{Jeon}, Mingyu and {Jeong}, Hyun-Jin and {Moon}, Yong-Jae and {Kang}, Jihye and {Kusano}, Kanya},
+        title = "{Real-time Extrapolation of Nonlinear Force-free Fields from Photospheric Vector Magnetic Fields Using a Physics-informed Neural Operator}",
+      journal = {\apjs},
+     keywords = {Solar magnetic fields, Solar active regions, The Sun, Neural networks, 1503, 1974, 1693, 1933},
+         year = 2025,
+        month = apr,
+       volume = {277},
+       number = {2},
+          eid = {54},
+        pages = {54},
+          doi = {10.3847/1538-4365/adbaea},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2025ApJS..277...54J},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
