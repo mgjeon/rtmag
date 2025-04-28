@@ -128,5 +128,7 @@ volume = {277},
 number = {2},
 pages = {54},
 author = {Jeon, Mingyu and Jeong, Hyun-Jin and Moon, Yong-Jae and Kang, Jihye and Kusano, Kanya},
+title = {Real-time Extrapolation of Nonlinear Force-free Fields from Photospheric Vector Magnetic Fields Using a Physics-informed Neural Operator},
+journal = {The Astrophysical Journal Supplement Series},
 }
 ```
