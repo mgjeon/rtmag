@@ -116,6 +116,9 @@ tensorboard --logdir=<base_path>
 - I use [pyvista](https://github.com/pyvista/pyvista) for 3D field line visualization in Colab notebook. Thanks to the authors.
 - I appreciate the community efforts in creating other open-source packages used in this research, such as [SunPy](https://github.com/sunpy/sunpy) and [Astropy](https://github.com/astropy/astropy).
 
+## Supplementary Materials
+- Additional (but unorganized) codes, including figure scripts and other resources, are available in [this repo](https://github.com/mgjeon/rtmag-nbs).
+
 ## Citation
 ```
 @ARTICLE{2025ApJS..277...54J,
